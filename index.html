@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Our Date! - Carl & Emma</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fcf9f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .card-container {
+            position: relative;
+            width: 360px;
+            height: 520px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            border-radius: 16px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .reveal-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+        h1 { color: #d4af37; font-size: 2.2rem; margin: 10px 0; font-family: Georgia, serif; }
+        p { color: #555; font-size: 1.1rem; line-height: 1.5; margin: 5px 0; letter-spacing: 1px; }
+        .date { font-size: 1.8rem; font-weight: bold; color: #222; margin: 25px 0; border-y: 1px solid #eee; padding: 10px 0; }
+        .cal-btn {
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: #d4af37;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+            box-shadow: 0 4px 10px rgba(212,175,55,0.3);
+        }
+        .cal-btn:hover { transform: scale(1.05); background: #c5a030; }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-container">
+    <!-- Underneath Layer (The Actual Details) -->
+    <div class="reveal-layer">
+        <p style="font-size: 0.9rem; color: #888;">SAVE THE DATE</p>
+        <h1>Carl & Emma</h1>
+        <p class="date">DECEMBER 22, 2026</p>
+        <p>Invitation to Follow</p>
+        <a class="cal-btn" href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Carl+%26+Emma%27s+Wedding&dates=20261222/20261223" target="_blank">Add to Calendar</a>
+    </div>
+
+    <!-- Scratch Layer Over the Top -->
+    <canvas id="scratchCanvas" width="360" height="520"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('scratchCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    // Fill the canvas with a solid "scratch-off" layer cover
+    ctx.fillStyle = '#bc985a'; 
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Add textured specks to look like a real scratch card
+    for (let i = 0; i < 500; i++) {
+        ctx.fillStyle = Math.random() > 0.5 ? '#ccaa6a' : '#ad894b';
+        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
+    }
+
+    // Add overlay text instructions
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Scratch here to reveal', 180, 240);
+    ctx.fillText('our secret!', 180, 270);
+
+    function scratch(e) {
+        if (!isDrawing) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        // Support mouse or touch coordinate tracking
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, 25, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // Event Listeners for Interaction
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    window.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
+
+    canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+    window.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e); }, { passive: false });
+</script>
+
+</body>
+</html>
